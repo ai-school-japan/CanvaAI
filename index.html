@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canva女子のAI秘書</title>
+<style>
+  :root{
+    --pink: #ff8fab;
+    --pink-light: #ffe3ec;
+    --pink-deep: #e85d8a;
+    --cream: #fff8f5;
+    --text: #4a3b3f;
+    --text-soft: #8a7478;
+    --star: #ffb64c;
+    --star-off: #e8dfe2;
+    --card-bg: #ffffff;
+    --shadow: 0 8px 24px rgba(232,93,138,0.12);
+  }
+  *{box-sizing:border-box;}
+  button{
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  body{
+    margin:0;
+    font-family: "Hiragino Maru Gothic ProN","Yu Gothic","Helvetica Neue",sans-serif;
+    background: linear-gradient(180deg, var(--cream) 0%, var(--pink-light) 100%);
+    color: var(--text);
+    min-height:100vh;
+    padding: 24px 16px 64px;
+  }
+  .wrap{max-width: 720px; margin: 0 auto;}
+  header{text-align:center; margin-bottom: 26px;}
+  header .badge{
+    display:inline-block;
+    background: var(--pink);
+    color:#fff;
+    font-size: 12px;
+    font-weight:700;
+    padding: 4px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  header h1{
+    font-size: 24px;
+    margin: 6px 0 8px;
+    line-height:1.4;
+  }
+  header p{
+    font-size: 13px;
+    color: var(--text-soft);
+    margin:0;
+  }
+
+  .progress{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-bottom: 22px;
+  }
+  .progress .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--star-off);
+    transition: background .2s ease;
+  }
+  .progress .dot.active{background: var(--pink);}
+
+  .back-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom: 14px;
+  }
+  .back-btn{
+    background: var(--card-bg);
+    border:none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size:12px;
+    font-weight:700;
+    color: var(--pink-deep);
+    cursor:pointer;
+    box-shadow: var(--shadow);
+  }
+  .crumb{
+    font-size:12px;
+    color: var(--text-soft);
+  }
+
+  .step-label{
+    font-size:13px;
+    font-weight:700;
+    color: var(--pink-deep);
+    margin: 4px 0 10px 4px;
+  }
+  .sub-heading{
+    font-size:18px;
+    font-weight:800;
+    margin: 0 0 4px 4px;
+  }
+  .sub-desc{
+    font-size:12px;
+    color: var(--text-soft);
+    margin: 0 0 16px 4px;
+  }
+
+  .grid2{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .grid3{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .pick-btn{
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 16px 8px;
+    text-align:center;
+    font-size: 13px;
+    font-weight:700;
+    color: var(--text);
+    cursor:pointer;
+    box-shadow: var(--shadow);
+    transition: all .15s ease;
+  }
+  .pick-btn .emoji{display:block; font-size:22px; margin-bottom:6px;}
+  .pick-btn .desc{
+    display:block;
+    font-size:10.5px;
+    font-weight:400;
+    color: var(--text-soft);
+    margin-top:4px;
+    line-height:1.4;
+  }
+  .pick-btn:hover{transform: translateY(-2px);}
+
+  .tone-btn{
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 12px 6px;
+    text-align:center;
+    font-size: 12.5px;
+    font-weight:700;
+    color: var(--text);
+    cursor:pointer;
+    box-shadow: var(--shadow);
+  }
+  .tone-btn .emoji{display:block; font-size:18px; margin-bottom:4px;}
+  .tone-btn:hover{transform: translateY(-2px);}
+
+  .recommend-card{
+    background: linear-gradient(135deg, var(--pink) 0%, var(--pink-deep) 100%);
+    color:#fff;
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .recommend-card .label{
+    font-size: 12px;
+    opacity:0.85;
+    font-weight:700;
+    margin-bottom: 6px;
+  }
+  .recommend-card .tool-name{
+    font-size: 22px;
+    font-weight:800;
+    margin-bottom: 6px;
+  }
+  .recommend-card .reason{
+    font-size: 13px;
+    line-height:1.6;
+    opacity:0.95;
+    margin-bottom: 14px;
+  }
+  .recommend-card .try-link{
+    display:inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.6);
+    color:#fff;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:700;
+    padding: 8px 16px;
+    border-radius: 999px;
+  }
+
+  .table-wrap{
+    background: var(--card-bg);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 6px;
+    overflow-x: auto;
+  }
+  table{
+    width:100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    min-width: 460px;
+  }
+  th, td{
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f3e6ea;
+  }
+  th{
+    color: var(--text-soft);
+    font-weight:700;
+    font-size: 11.5px;
+  }
+  td.tool-cell{
+    text-align:left;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  td.note-cell{
+    text-align:left;
+    color: var(--text-soft);
+    font-size:11.5px;
+  }
+  tr:last-child td{border-bottom:none;}
+  .stars{white-space:nowrap; letter-spacing:1px;}
+  .stars .on{color: var(--star);}
+  .stars .off{color: var(--star-off);}
+
+  .restart-row{
+    text-align:center;
+    margin-top: 20px;
+  }
+  .restart-btn{
+    background: var(--card-bg);
+    border:none;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size:13px;
+    font-weight:700;
+    color: var(--pink-deep);
+    cursor:pointer;
+    box-shadow: var(--shadow);
+  }
+
+  .note{
+    font-size: 11px;
+    color: var(--text-soft);
+    text-align:center;
+    margin-top: 14px;
+    line-height:1.6;
+  }
+  footer{
+    text-align:center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--text-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="badge">Canva女子のためのAIアプリ</span>
+    <h1>♡ Canva女子のAI秘書 ♡</h1>
+    <p>今から作りたいものを選ぶだけ。どのAIを使えばいいか、ひと目でわかります。</p>
+  </header>
+
+  <div class="progress" id="progress">
+    <span class="dot" data-step="1"></span>
+    <span class="dot" data-step="2"></span>
+    <span class="dot" data-step="3"></span>
+  </div>
+
+  <div id="screen"></div>
+
+  <footer>© Canva女子のAI秘書</footer>
+</div>
+
+<script>
+/* ---------- ツール ---------- */
+const TOOLS = {
+  chatgpt:     { name: "ChatGPT",             url: "https://chat.openai.com" },
+  gemini:      { name: "Gemini",              url: "https://gemini.google.com" },
+  claude:      { name: "Claude",              url: "https://claude.ai" },
+  magic:       { name: "Canva Magic Studio",  url: "https://www.canva.com" },
+  firefly:     { name: "Adobe Firefly",       url: "https://firefly.adobe.com" },
+  suno:        { name: "Suno",                url: "https://suno.com" },
+  elevenlabs:  { name: "ElevenLabs",          url: "https://elevenlabs.io" },
+  capcut:      { name: "CapCut",              url: "https://www.capcut.com" },
+  claudecode:  { name: "Claude Code",         url: "https://claude.ai/code" },
+  codex:       { name: "Codex",               url: "https://chatgpt.com/codex/" },
+  antigravity: { name: "Antigravity",         url: "https://antigravity.google" },
+  midjourney:  { name: "Midjourney",          url: "https://www.midjourney.com" },
+  ideogram:    { name: "Ideogram",            url: "https://ideogram.ai" },
+};
+
+/* ---------- 用途タイプごとのおすすめ順+得意コメント ---------- */
+const TASK_PROFILES = {
+  creative_text: [
+    { tool:"chatgpt", note:"アイデア出し・短い言葉の量産が得意" },
+    { tool:"gemini",  note:"トレンドを踏まえた発想が得意" },
+    { tool:"claude",  note:"自然な言い回しでまとめるのが得意" },
+  ],
+  long_text: [
+    { tool:"claude",  note:"長文でも破綻しない自然な文章が得意" },
+    { tool:"chatgpt", note:"読みやすく整った文章にまとめるのが得意" },
+    { tool:"gemini",  note:"簡潔にまとめるのが得意" },
+  ],
+  search_text: [
+    { tool:"gemini",  note:"検索トレンドやキーワードに強い" },
+    { tool:"chatgpt", note:"定番タグを幅広く提案するのが得意" },
+    { tool:"claude",  note:"文脈に合った少数精鋭の選定が得意" },
+  ],
+  sales_text: [
+    { tool:"claude",  note:"説得力のある構成・論理展開が得意" },
+    { tool:"chatgpt", note:"訴求案を複数比較しながら作れる" },
+    { tool:"gemini",  note:"市場感を踏まえた提案が得意" },
+  ],
+  profile_text: [
+    { tool:"chatgpt", note:"個性を出した自己紹介文が得意" },
+    { tool:"claude",  note:"落ち着いたトーンでまとめるのが得意" },
+    { tool:"gemini",  note:"簡潔で読みやすい文章が得意" },
+  ],
+  image_canva: [
+    { tool:"chatgpt",    stars:5, note:"アイデア→生成→修正まで会話で完結" },
+    { tool:"gemini",     stars:5, note:"画像+動画+マルチモーダル" },
+    { tool:"midjourney", stars:4, note:"ビジュアル・世界観・アート表現" },
+  ],
+  image_visual: [
+    { tool:"midjourney", stars:5, note:"圧倒的なビジュアル表現力とアートテイスト" },
+    { tool:"ideogram",   stars:4, note:"文字入り・レイアウトの正確さに強い" },
+    { tool:"chatgpt",    stars:5, note:"指示への理解度が高く、修正も会話で完結" },
+    { tool:"gemini",     stars:4, note:"画像+動画+マルチモーダルで幅広く対応" },
+  ],
+  image_font: [
+    { tool:"midjourney", stars:3, note:"圧倒的なビジュアル表現力とアートテイスト" },
+    { tool:"ideogram",   stars:5, note:"文字入り・レイアウトの正確さに強い" },
+    { tool:"chatgpt",    stars:4, note:"指示への理解度が高く、修正も会話で完結" },
+    { tool:"gemini",     stars:3, note:"画像+動画+マルチモーダルで幅広く対応" },
+  ],
+  image_composition: [
+    { tool:"midjourney", stars:4, note:"圧倒的なビジュアル表現力とアートテイスト" },
+    { tool:"ideogram",   stars:5, note:"文字入り・レイアウトの正確さに強い" },
+    { tool:"chatgpt",    stars:5, note:"指示への理解度が高く、修正も会話で完結" },
+    { tool:"gemini",     stars:4, note:"画像+動画+マルチモーダルで幅広く対応" },
+  ],
+  video_asset: [
+    { tool:"gemini",     stars:5, note:"画像+動画+マルチモーダル" },
+    { tool:"chatgpt",    stars:4, note:"アイデア→生成→修正まで会話で完結" },
+    { tool:"midjourney", stars:3, note:"ビジュアル・世界観・アート表現" },
+  ],
+  design_style: [
+    { tool:"magic",   note:"テンプレートとの相性がよく提案が早い" },
+    { tool:"firefly", note:"配色・素材のクオリティが高い" },
+    { tool:"claude",  note:"言葉で世界観を言語化してくれる" },
+  ],
+  video_script: [
+    { tool:"claude",  note:"起承転結のある台本構成が得意" },
+    { tool:"chatgpt", note:"テンポの良いフックを考えるのが得意" },
+    { tool:"gemini",  note:"トレンドを踏まえた構成が得意" },
+  ],
+  video_edit: [
+    { tool:"capcut",  note:"スマホひとつでAI自動編集ができる" },
+    { tool:"chatgpt", note:"編集の構成案を相談できる" },
+  ],
+  audio_voice: [
+    { tool:"elevenlabs", note:"自然な音声読み上げに特化" },
+    { tool:"chatgpt",    note:"ナレーション原稿の作成が得意" },
+  ],
+  audio_music: [
+    { tool:"suno",   note:"歌詞やイメージからオリジナルBGMを生成できる" },
+    { tool:"capcut", note:"動画用の著作権フリー音源を探しやすい" },
+  ],
+  doc_slide: [
+    { tool:"chatgpt", note:"スライド構成のたたき台作りが得意" },
+    { tool:"gemini",  note:"要点を簡潔にまとめるのが得意" },
+    { tool:"claude",  note:"長い資料でも一貫性のある構成が作れる" },
+  ],
+  code_web: [
+    { tool:"claudecode",  note:"ターミナルで動く本格派。複雑な実装や大規模な修正が得意" },
+    { tool:"codex",       note:"OpenAIのコーディングエージェント。幅広い言語に対応" },
+    { tool:"antigravity", note:"Googleのエージェント型IDE。Gemini連携で自動化が得意" },
+  ],
+};
+
+/* ---------- 雰囲気による優先ボーナス ---------- */
+const TONE_BONUS = {
+  yasashii:  { claude:1, elevenlabs:1 },
+  kawaii:    { chatgpt:1, magic:1 },
+  oshare:    { firefly:1, claude:1 },
+  natural:   { magic:1, firefly:1 },
+  kokyu:     { firefly:2, claude:1 },
+  simple:    { gemini:1, magic:1 },
+  pop:       { chatgpt:2, suno:1 },
+  sekaikan:  { claude:2, firefly:1 },
+  business:  { claude:2, antigravity:1 },
+  josei:     { chatgpt:1, magic:1 },
+};
+
+const TONES = [
+  { id:"yasashii", emoji:"🌸", label:"やさしい" },
+  { id:"kawaii",   emoji:"🎀", label:"かわいい" },
+  { id:"oshare",   emoji:"✨", label:"おしゃれ" },
+  { id:"natural",  emoji:"🌿", label:"ナチュラル" },
+  { id:"kokyu",    emoji:"💎", label:"高級感" },
+  { id:"simple",   emoji:"🖤", label:"シンプル" },
+  { id:"pop",      emoji:"🌈", label:"ポップ" },
+  { id:"sekaikan", emoji:"🔮", label:"世界観重視" },
+  { id:"business", emoji:"💼", label:"ビジネス" },
+  { id:"josei",    emoji:"💕", label:"女性向け" },
+];
+
+/* ---------- 大分類 + サブカテゴリ ---------- */
+const CATEGORIES = [
+  {
+    id:"insta", emoji:"📱", label:"Instagram投稿",
+    desc:"投稿ネタ・キャプション・コピー・カルーセルなど",
+    subs:[
+      { id:"idea",       emoji:"💡", label:"投稿ネタ・企画",   task:"creative_text" },
+      { id:"caption",    emoji:"📝", label:"投稿文・キャプション", task:"long_text" },
+      { id:"catch",      emoji:"✨", label:"キャッチコピー",   task:"creative_text" },
+      { id:"carousel",   emoji:"📚", label:"カルーセル構成",   task:"creative_text" },
+      { id:"postimage",  emoji:"🖼️", label:"投稿画像",       task:"image_canva" },
+      { id:"designcomp", emoji:"🎨", label:"デザイン構成",     task:"design_style" },
+      { id:"hashtag",    emoji:"🔖", label:"ハッシュタグ",     task:"search_text" },
+      { id:"cta",        emoji:"📣", label:"CTA・行動喚起",   task:"creative_text" },
+    ]
+  },
+  {
+    id:"reel", emoji:"🎬", label:"リール・動画",
+    desc:"台本・構成・ナレーション・動画素材など",
+    subs:[
+      { id:"videoidea",  emoji:"💡", label:"動画ネタ・企画",  task:"creative_text" },
+      { id:"script",     emoji:"📝", label:"リール台本",     task:"video_script" },
+      { id:"structure",  emoji:"🎬", label:"動画構成",       task:"video_script" },
+      { id:"narration",  emoji:"🎙️", label:"ナレーション",   task:"audio_voice" },
+      { id:"cover",      emoji:"🖼️", label:"リール表紙",     task:"image_canva" },
+      { id:"videoasset", emoji:"🎨", label:"動画素材",       task:"video_asset" },
+      { id:"bgm",        emoji:"🎵", label:"BGM・音楽",      task:"audio_music" },
+      { id:"edit",       emoji:"✂️", label:"動画編集",       task:"video_edit" },
+    ]
+  },
+  {
+    id:"design", emoji:"🎨", label:"画像・デザイン",
+    desc:"画像生成・素材・配色・レイアウトなど",
+    subs:[
+      { id:"imagegen",  emoji:"🖼️", label:"画像生成",   task:"image_visual" },
+      { id:"person",    emoji:"👩", label:"人物画像",   task:"image_visual" },
+      { id:"bg",        emoji:"🌸", label:"背景・素材", task:"image_visual" },
+      { id:"color",     emoji:"🎨", label:"配色",       task:"image_visual" },
+      { id:"font",      emoji:"🔤", label:"フォント",   task:"image_font" },
+      { id:"layout",    emoji:"📐", label:"レイアウト", task:"image_composition" },
+      { id:"tonmana",   emoji:"🪄", label:"世界観・トンマナ", task:"image_visual" },
+      { id:"banner",    emoji:"🖥️", label:"バナー",     task:"image_composition" },
+    ]
+  },
+  {
+    id:"copy", emoji:"✍️", label:"文章・コピー",
+    desc:"文章・キャッチコピー・広告文・LPなど",
+    subs:[
+      { id:"lp",       emoji:"📄", label:"LP・セールスレター", task:"sales_text" },
+      { id:"ad",       emoji:"📣", label:"広告文言",         task:"sales_text" },
+      { id:"intro",    emoji:"🎁", label:"商品・サービス紹介", task:"sales_text" },
+      { id:"catch2",   emoji:"💎", label:"キャッチコピー",   task:"creative_text" },
+      { id:"salespage",emoji:"🛒", label:"販売ページ",       task:"sales_text" },
+      { id:"mail",     emoji:"📧", label:"メール・LINE文章", task:"long_text" },
+      { id:"cta2",     emoji:"🔗", label:"CTA・誘導文",      task:"creative_text" },
+      { id:"review",   emoji:"⭐", label:"レビュー・お客様の声の整理", task:"long_text" },
+    ]
+  },
+  {
+    id:"sns", emoji:"📣", label:"SNS・集客",
+    desc:"プロフィール・ストーリーズ・DM・告知など",
+    subs:[
+      { id:"profile",   emoji:"📸", label:"プロフィール文章", task:"profile_text" },
+      { id:"story",     emoji:"💬", label:"ストーリーズ",     task:"creative_text" },
+      { id:"campaign",  emoji:"📢", label:"告知・キャンペーン", task:"sales_text" },
+      { id:"dm",        emoji:"💌", label:"DM文章",          task:"long_text" },
+      { id:"comment",   emoji:"💬", label:"コメント返信",     task:"creative_text" },
+      { id:"calendar",  emoji:"📅", label:"投稿カレンダー・企画", task:"creative_text" },
+    ]
+  },
+  {
+    id:"doc", emoji:"📄", label:"資料・PDF",
+    desc:"スライド・資料・教材・PDFなど",
+    subs:[
+      { id:"slide",     emoji:"📊", label:"資料・スライド構成", task:"doc_slide" },
+      { id:"ebook",     emoji:"📕", label:"電子書籍・PDF",   task:"doc_slide" },
+      { id:"material",  emoji:"🎓", label:"教材・テンプレート", task:"doc_slide" },
+      { id:"checklist", emoji:"📋", label:"チェックリスト・ワークシート", task:"doc_slide" },
+    ]
+  },
+  {
+    id:"audio", emoji:"🎵", label:"音楽・音声",
+    desc:"BGM・音楽・ナレーション・音声など",
+    subs:[
+      { id:"music",     emoji:"🎵", label:"BGM・音楽生成",     task:"audio_music" },
+      { id:"voice",     emoji:"🎙️", label:"ナレーション・音声読み上げ", task:"audio_voice" },
+      { id:"sfx",       emoji:"🎧", label:"効果音",           task:"audio_music" },
+    ]
+  },
+  {
+    id:"web", emoji:"💻", label:"Web・アプリ",
+    desc:"Webサイト・LP・アプリ・コードなど",
+    subs:[
+      { id:"website",   emoji:"🌐", label:"Webサイト制作",   task:"code_web" },
+      { id:"lppage",    emoji:"📄", label:"LPページ制作",    task:"code_web" },
+      { id:"app",       emoji:"📱", label:"簡単なアプリ・ツール", task:"code_web",
+        starOverride:{
+          yasashii: { claudecode:4, codex:3, antigravity:5 },
+          kawaii:   { claudecode:4, codex:3, antigravity:5 },
+          oshare:   { claudecode:4, codex:3, antigravity:5 },
+          natural:  { claudecode:3, codex:4, antigravity:5 },
+          kokyu:    { claudecode:4, codex:5, antigravity:3 },
+          simple:   { claudecode:5, codex:5, antigravity:4 },
+          pop:      { claudecode:3, codex:4, antigravity:5 },
+          sekaikan: { claudecode:5, codex:3, antigravity:4 },
+          business: { claudecode:5, codex:5, antigravity:3 },
+          josei:    { claudecode:3, codex:4, antigravity:5 },
+        } },
+      { id:"code",      emoji:"💻", label:"コード・プログラム相談", task:"code_web" },
+    ]
+  },
+];
+
+/* ---------- 状態管理 ---------- */
+const state = { catId:null, subId:null, toneId:null };
+const screenEl = document.getElementById('screen');
+
+function setProgress(step){
+  document.querySelectorAll('#progress .dot').forEach(d => {
+    d.classList.toggle('active', Number(d.dataset.step) <= step);
+  });
+}
+
+function starHtml(n){
+  let out = '<span class="stars">';
+  for(let i=1;i<=5;i++){
+    out += `<span class="${i<=n ? 'on':'off'}">★</span>`;
+  }
+  out += '</span>';
+  return out;
+}
+
+function renderMain(){
+  setProgress(1);
+  screenEl.innerHTML = `
+    <div class="step-label">STEP1 今から作りたいものは?</div>
+    <div class="grid2" id="mainGrid"></div>
+  `;
+  const grid = document.getElementById('mainGrid');
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pick-btn';
+    btn.innerHTML = `<span class="emoji">${cat.emoji}</span>${cat.label}<span class="desc">${cat.desc}</span>`;
+    btn.addEventListener('click', () => {
+      state.catId = cat.id;
+      renderSub();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function renderSub(){
+  setProgress(1);
+  const cat = CATEGORIES.find(c => c.id === state.catId);
+  screenEl.innerHTML = `
+    <div class="back-row">
+      <button class="back-btn" id="backToMain">← もどる</button>
+      <span class="crumb">${cat.emoji} ${cat.label}</span>
+    </div>
+    <div class="sub-heading">${cat.emoji} ${cat.label}</div>
+    <div class="sub-desc">何を作りたい?</div>
+    <div class="grid2" id="subGrid"></div>
+  `;
+  document.getElementById('backToMain').addEventListener('click', renderMain);
+  const grid = document.getElementById('subGrid');
+  cat.subs.forEach(sub => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pick-btn';
+    btn.innerHTML = `<span class="emoji">${sub.emoji}</span>${sub.label}`;
+    btn.addEventListener('click', () => {
+      state.subId = sub.id;
+      renderTone();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function renderTone(){
+  setProgress(2);
+  const cat = CATEGORIES.find(c => c.id === state.catId);
+  const sub = cat.subs.find(s => s.id === state.subId);
+  screenEl.innerHTML = `
+    <div class="back-row">
+      <button class="back-btn" id="backToSub">← もどる</button>
+      <span class="crumb">${cat.emoji} ${cat.label} / ${sub.emoji} ${sub.label}</span>
+    </div>
+    <div class="step-label">STEP2 どんな雰囲気にしたい?</div>
+    <div class="grid3" id="toneGrid"></div>
+  `;
+  document.getElementById('backToSub').addEventListener('click', renderSub);
+  const grid = document.getElementById('toneGrid');
+  TONES.forEach(tone => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tone-btn';
+    btn.innerHTML = `<span class="emoji">${tone.emoji}</span>${tone.label}`;
+    btn.addEventListener('click', () => {
+      state.toneId = tone.id;
+      renderResult();
+    });
+    grid.appendChild(btn);
+  });
+}
+
+function renderResult(){
+  setProgress(3);
+  const cat = CATEGORIES.find(c => c.id === state.catId);
+  const sub = cat.subs.find(s => s.id === state.subId);
+  const tone = TONES.find(t => t.id === state.toneId);
+  const bonus = TONE_BONUS[tone.id] || {};
+  const profile = TASK_PROFILES[sub.task];
+  const starMap = sub.starOverride && sub.starOverride[tone.id];
+  const hasExplicitStars = !starMap && profile.every(e => e.stars !== undefined);
+
+  let ranked;
+  if (starMap) {
+    ranked = profile
+      .map(entry => ({ ...entry, stars: starMap[entry.tool] }))
+      .sort((a, b) => b.stars - a.stars);
+  } else if (hasExplicitStars) {
+    ranked = profile
+      .map(entry => ({
+        ...entry,
+        stars: Math.min(5, Math.max(1, entry.stars + (bonus[entry.tool] || 0)))
+      }))
+      .sort((a, b) => b.stars - a.stars);
+  } else {
+    ranked = profile
+      .map((entry, idx) => ({
+        ...entry,
+        score: (profile.length - idx) + (bonus[entry.tool] || 0)
+      }))
+      .sort((a, b) => b.score - a.score)
+      .map((entry, idx) => ({ ...entry, stars: Math.max(1, 5 - idx) }));
+  }
+
+  const top = ranked[0];
+  const topTool = TOOLS[top.tool];
+
+  screenEl.innerHTML = `
+    <div class="back-row">
+      <button class="back-btn" id="backToTone">← もどる</button>
+      <span class="crumb">${cat.emoji} ${cat.label} / ${sub.emoji} ${sub.label} / ${tone.emoji} ${tone.label}</span>
+    </div>
+    <div class="step-label">STEP3 おすすめAIを比較</div>
+    <div class="recommend-card">
+      <div class="label">${sub.label} を ${tone.label} に仕上げたいなら</div>
+      <div class="tool-name">${topTool.name} ♡</div>
+      <div class="reason">${top.note}</div>
+      <a class="try-link" href="${topTool.url}" target="_blank" rel="noopener">このAIを試してみる ♡</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">AI</th><th>おすすめ度</th><th style="text-align:left;">得意</th></tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+      </table>
+    </div>
+    <div class="note">おすすめ度は「${sub.label}」を「${tone.label}」に仕上げる場合の目安です。<br>各AIの仕様・料金は更新される場合があります。</div>
+    <div class="restart-row"><button class="restart-btn" id="restartBtn">はじめからやり直す</button></div>
+  `;
+  document.getElementById('backToTone').addEventListener('click', renderTone);
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    state.catId = null; state.subId = null; state.toneId = null;
+    renderMain();
+  });
+
+  const body = document.getElementById('resultBody');
+  ranked.forEach((entry, idx) => {
+    const t = TOOLS[entry.tool];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="tool-cell">${t.name}${idx===0 ? ' 🌟':''}</td>
+      <td>${starHtml(entry.stars)}</td>
+      <td class="note-cell">${entry.note}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+renderMain();
+</script>
+</body>
+</html>

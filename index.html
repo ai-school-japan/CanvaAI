@@ -4,7 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Canva女子のAI秘書</title>
+
+<!-- ① 検索エンジン除け -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- ② Netlifyのバッジ・スクリプト読み込みをブラウザ側で完全遮断 -->
+<meta http-equiv="Content-Security-Policy" content="frame-src 'none'; child-src 'none'; script-src 'self' 'unsafe-inline' https:;">
+
 <style>
+  /* ③ 万が一挿入されても画面に一切描画させずタップ判定も消す */
+  iframe,
+  #netlify-hud,
+  div[id*="netlify"],
+  div[class*="netlify"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+  }
+
   :root{
     --pink: #ff8fab;
     --pink-light: #ffe3ec;
